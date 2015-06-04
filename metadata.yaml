@@ -1,0 +1,19 @@
+name: nginx-proxy
+summary: This charm sets up the Nginx service as a reverse proxy.
+maintainer: Matthew Bruzek <matthew.bruzek@canonical.com>
+description: |
+  Nginx is a free open-source HTTP server and reverse proxy.  It can handle
+  multiple requests with low resource consumption. Proxying is used to
+  distribute load by passing requests along to multiple servers.
+tags:
+  - performance
+subordinate: false
+provides:
+  website:
+    interface: http
+requires:
+  template:
+    interface: consul
+peers:
+  peer:
+    interface: nginx-peer

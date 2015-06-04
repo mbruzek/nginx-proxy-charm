@@ -1,0 +1,5 @@
+options:
+  service-name:
+    type: string
+    default: "http"
+    description: "The service names - defined in consul - to proxy with this charm."

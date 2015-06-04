@@ -1,0 +1,22 @@
+#!/usr/bin/python
+
+import sys
+
+from charmhelpers.core import (
+    hookenv,
+    host,
+)
+
+hooks = hookenv.Hooks()
+
+
+@hooks.hook('stop')
+def stop():
+    for service in ['nginx', 'consul-template']:
+        hookenv.log('Stopping {0}'.format(service))
+        host.service_stop(service)
+
+
+if __name__ == '__main__':
+    # execute a hook based on the name the program is called by
+    hooks.execute(sys.argv)

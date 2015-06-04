@@ -1,0 +1,40 @@
+#!/usr/bin/python
+
+import sys
+import consultemplate
+
+from charmhelpers.core import hookenv
+
+MANAGED_SERVICE = 'nginx'
+
+hooks = hookenv.Hooks()
+
+
+@hooks.hook('template-relation-changed')
+def consul_changed():
+    """
+    Called when a value changes on the consul relationship. Only the consul
+    server address or port could change.
+    Start the consult
+    """
+    hookenv.log('Entering template-relation-changed.')
+
+    # Get the relation values that contain the consul server address and port.
+    address = hookenv.relation_get('address')
+    port = hookenv.relation_get('port')
+    hookenv.log('Consul server address and port {0}:{1}'.format(address, port))
+
+    # Configure the consul server, and manage the haproxy cfg file.
+    changed = consultemplate.configure_consul_template(address, port)
+
+    # Start consul-template, reload if the configuration changed.
+    consultemplate.ensure_consul_template_running(changed)
+
+    # Start the service that consul-template is managing the configuration for.
+    consultemplate.start_managed_service(MANAGED_SERVICE)
+
+    hookenv.log('Exited template-relation-changed.')
+
+
+if __name__ == '__main__':
+    hooks.execute(sys.argv)

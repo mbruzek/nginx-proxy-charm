@@ -1,0 +1,8 @@
+{
+  "consul": "consul_server_address:8500",
+  "template": {
+    "source": "/etc/nginx/nginx.ctmpl",
+    "destination": "/etc/nginx/nginx.conf",
+    "command": "service nginx reload"
+  }
+}
