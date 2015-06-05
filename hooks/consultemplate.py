@@ -12,7 +12,7 @@ CONSUL_TEMPLATE_INIT = path('/etc/init/consul-template.conf')
 CONSUL_TEMPLATE_SERVICE = 'consul-template'
 DEFAULT_JSON = path(hookenv.charm_dir() + '/files/consul/consul-template.json')
 MANAGED_CTMPL = path('/etc/nginx/nginx.ctmpl')
-MANAGED_CONFIG = path('/etc/nginx/nginx.config')
+MANAGED_CONFIG = path('/etc/nginx/sites-enabled/juju')
 MANAGED_SERVICE = 'nginx'
 ORIGINAL_CTMPL = path(hookenv.charm_dir() + '/files/consul/nginx.ctmpl')
 RELEASE_URL = 'https://github.com/hashicorp/consul-template/releases/download'
@@ -82,6 +82,7 @@ def configure_consul_template(consul_address, consul_port):
     See https://github.com/hashicorp/consul-template#options for more
     consul-template configuration options.
     """
+    # The consul string format is:  "consul-server-address:8500"
     consul_server = '{0}:{1}'.format(consul_address, consul_port)
 
     # Read current configuration file to see if we need to configure anything.
@@ -91,8 +92,9 @@ def configure_consul_template(consul_address, consul_port):
     if changed:
         data = read_json_configuration(DEFAULT_JSON)
         data['consul'] = consul_server
-        # The template source is written in consul configuration language.
+        # The source is where the managed consul-template template exists.
         data['template']['source'] = MANAGED_CTMPL
+        # The destination is where to write the final configuration file.
         data['template']['destination'] = MANAGED_CONFIG
         print('Writing file {0}'.format(CONSUL_TEMPLATE_CONFIG))
         with open(CONSUL_TEMPLATE_CONFIG, 'w') as stream:

@@ -2,7 +2,7 @@
 
 import setup
 setup.pre_install()
-
+import os
 import sys
 import consultemplate
 
@@ -18,6 +18,8 @@ def install():
     fetch.apt_install(fetch.filter_installed_packages(['nginx']))
     hookenv.log('Installing consul-template')
     consultemplate.install_consul_template()
+    if os.path.isfile('/etc/nginx/sites-enabled/default'):
+        os.remove('/etc/nginx/sites-enabled/default')
     hookenv.log('Install complete.')
 
 

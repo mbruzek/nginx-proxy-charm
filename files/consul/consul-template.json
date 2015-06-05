@@ -2,7 +2,7 @@
   "consul": "consul_server_address:8500",
   "template": {
     "source": "/etc/nginx/nginx.ctmpl",
-    "destination": "/etc/nginx/nginx.conf",
+    "destination": "/etc/nginx/sites-enabled/juju",
     "command": "service nginx reload"
   }
 }
