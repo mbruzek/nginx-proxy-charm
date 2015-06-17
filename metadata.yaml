@@ -11,9 +11,13 @@ subordinate: false
 provides:
   website:
     interface: http
+  public-website:
+    interface: public-http
 requires:
   template:
     interface: consul
+  dns:
+    interface: programmable-multiple
 peers:
   peer:
     interface: nginx-peer
