@@ -1,4 +1,4 @@
-# Overview
+# NGINX Proxy Charm
 
 Nginx is a free open-source HTTP server and reverse proxy.  It can handle
 multiple requests with low resource consumption. Proxying is used to
@@ -8,9 +8,8 @@ Consul-template is a service that connects to a Consul server that manages
 the configuration files for other services based on the Service Discovery of
 the Consul server.
 
-# Usage
+# How to use the nginx-proxy charm
 
-Step by step instructions on deploying this charm:
 
     juju deploy nginx-proxy
     juju deploy consul
@@ -18,15 +17,25 @@ Step by step instructions on deploying this charm:
     juju add-relation nginx-proxy:template consul:consul-api
 
 
-# Configuration
+# Charm Configuration
 
 **service-name** is the name that consul-template builds the reverse proxy list
 from.
 
-# Contact Information
+### Reconfigure w/ auto forwarding from Consul
 
-Though this will be listed in the charm store itself don't assume a user will know that, so include that information here:
+The charm has a `public-website` relationship, that implements a prototype
+interface to setup automatic website proxy'ing based on data from Consul.
 
+    juju deploy cs:~zoology/trusty/consul
+    juju deploy cs:~zoology/trusty/dns
+    juju set dns provider=rt53 provider_keys="AWS_ACESS_KEY_ID|XXX AWS_PRIVATE ACCESS_KEY|XXX"
+    juju add-relation dns consul
+    juju add-relation dns nginx-proxy
+
+
+
+# Upstream Contact Information
 
 - [Nginx community](http://wiki.nginx.org/Main)
 - [Getting started with Nginx](http://wiki.nginx.org/GettingStarted)

@@ -1,0 +1,40 @@
+#!/usr/bin/python
+
+import sys
+from charmhelpers.core import hookenv
+import subprocess
+
+MANAGED_SERVICE = 'nginx'
+
+hooks = hookenv.Hooks()
+
+
+@hooks.hook('public-website-relation-joined')
+def website_changed():
+    hookenv.log('Entering public-website-relation-changed.')
+
+    relid = hookenv.relation_id()
+
+
+    # do our best attempt to get the ip address from a public hostname, default
+    # to returning the units public-address if all else fails.
+    ip = get_ip(hookenv.unit_get('public-address'))
+    if not ip:
+        ip = hookenv.unit_get('public-address')
+
+    hookenv.relation_set(relid, {'public-address': ip, 'port': 80})
+
+    hookenv.log('Exited template-relation-changed.')
+
+
+def get_ip(hostname):
+    hostname = hostname.strip()
+    try:
+        out = subprocess.check_output(['dig', '+short', hostname]).rstrip('\n')
+        return out.split('\n')[-1]
+    except:
+        return None
+
+
+if __name__ == '__main__':
+    hooks.execute(sys.argv)

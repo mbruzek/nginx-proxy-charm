@@ -1,0 +1,46 @@
+#!/usr/bin/python
+
+import sys
+from charmhelpers.core import hookenv
+from path import Path
+import subprocess
+
+MANAGED_SERVICE = 'nginx'
+hooks = hookenv.Hooks()
+
+
+@hooks.hook('public-website-relation-changed')
+def website_changed():
+    hookenv.log('Entering public-website-relation-changed.')
+
+    ip = get_ip(hookenv.unit_get('public-address'))
+    if not ip:
+        ip = hookenv.unit_get('public-address')
+
+    relid = hookenv.relation_id()
+    hookenv.relation_set(relid, {'public-address': ip, 'port': 80})
+    hookenv.log('Exited template-relation-changed.')
+
+    domain = hookenv.relation_get('domain')
+    if domain:
+        # we have dns data, update existing consul-template
+        # TODO: make this more permanent and live w/ the template relation
+        with open('files/dns/nginx-vhost', 'r') as f:
+            template = f.read()
+            template = template.replace('.domain', ".{}".format( domain))
+        with open('/etc/nginx/nginx.ctmpl', 'w+') as f:
+            f.write(template)
+        subprocess.call(['service','consul-template','restart'])
+
+
+def get_ip(hostname):
+    hostname = hostname.strip()
+    try:
+        out = subprocess.check_output(['dig', '+short', hostname]).rstrip('\n')
+        return out.split('\n')[-1]
+    except:
+        return None
+
+
+if __name__ == '__main__':
+    hooks.execute(sys.argv)
